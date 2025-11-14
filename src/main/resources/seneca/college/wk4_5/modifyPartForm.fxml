@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="seneca.college.wk4_5.controller.ModifyPartController">
+    <children>
+        <!-- Title -->
+        <Label layoutX="20.0" layoutY="20.0" text="Modify Part">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+
+        <!-- Radio Buttons for Part Type -->
+        <Label layoutX="50.0" layoutY="70.0" text="Part Type:">
+            <font>
+                <Font name="System Bold" size="12.0" />
+            </font>
+        </Label>
+
+        <RadioButton fx:id="inHouseRadio" layoutX="150.0" layoutY="70.0" mnemonicParsing="false" onAction="#onPartTypeChange" text="In-House">
+            <toggleGroup>
+                <ToggleGroup fx:id="partTypeGroup" />
+            </toggleGroup>
+        </RadioButton>
+
+        <RadioButton fx:id="outsourcedRadio" layoutX="250.0" layoutY="70.0" mnemonicParsing="false" onAction="#onPartTypeChange" text="Outsourced" toggleGroup="$partTypeGroup" />
+
+        <!-- Part ID Field -->
+        <Label layoutX="50.0" layoutY="120.0" text="ID:" />
+        <TextField fx:id="idField" disable="true" layoutX="150.0" layoutY="116.0" prefWidth="200.0" promptText="Auto Generated" />
+
+        <!-- Part Name Field -->
+        <Label layoutX="50.0" layoutY="160.0" text="Name:" />
+        <TextField fx:id="nameField" layoutX="150.0" layoutY="156.0" prefWidth="200.0" />
+
+        <!-- Inventory Level Field -->
+        <Label layoutX="50.0" layoutY="200.0" text="Inv:" />
+        <TextField fx:id="invField" layoutX="150.0" layoutY="196.0" prefWidth="200.0" />
+
+        <!-- Price/Cost Field -->
+        <Label layoutX="50.0" layoutY="240.0" text="Price/Cost:" />
+        <TextField fx:id="priceField" layoutX="150.0" layoutY="236.0" prefWidth="200.0" />
+
+        <!-- Max Field -->
+        <Label layoutX="50.0" layoutY="280.0" text="Max:" />
+        <TextField fx:id="maxField" layoutX="150.0" layoutY="276.0" prefWidth="80.0" />
+
+        <!-- Min Field -->
+        <Label layoutX="260.0" layoutY="280.0" text="Min:" />
+        <TextField fx:id="minField" layoutX="300.0" layoutY="276.0" prefWidth="80.0" />
+
+        <!-- Machine ID / Company Name Field (Dynamic Label and Field) -->
+        <Label fx:id="machineCompanyLabel" layoutX="50.0" layoutY="320.0" text="Machine ID:" />
+        <TextField fx:id="machineCompanyField" layoutX="150.0" layoutY="316.0" prefWidth="200.0" />
+
+        <!-- Action Buttons -->
+        <Button fx:id="saveButton" layoutX="250.0" layoutY="370.0" mnemonicParsing="false" onAction="#onSave" text="Save" />
+        <Button fx:id="cancelButton" layoutX="300.0" layoutY="370.0" mnemonicParsing="false" onAction="#onCancel" text="Cancel" />
+    </children>
+</AnchorPane>
