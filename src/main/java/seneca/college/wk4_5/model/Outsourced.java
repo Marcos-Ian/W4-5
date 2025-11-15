@@ -17,8 +17,7 @@ package seneca.college.wk4_5.model;
  */
 public class Outsourced extends Part {
 
-    // Private instance variable as per UML diagram
-    private String companyName;
+    private final javafx.beans.property.StringProperty companyName;
 
     /**
      * Constructor for Outsourced part as specified in UML diagram
@@ -34,7 +33,7 @@ public class Outsourced extends Part {
     public Outsourced(int id, String name, double price, int stock, int min, int max, String companyName) {
         // Call parent constructor
         super(id, name, price, stock, min, max);
-        this.companyName = companyName;
+        this.companyName = new javafx.beans.property.SimpleStringProperty(companyName);
     }
 
     /**
@@ -43,7 +42,7 @@ public class Outsourced extends Part {
      * @param companyName The company name to set
      */
     public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+        this.companyName.set(companyName);
     }
 
     /**
@@ -52,6 +51,10 @@ public class Outsourced extends Part {
      * @return The company name
      */
     public String getCompanyName() {
+        return companyName.get();
+    }
+
+    public javafx.beans.property.StringProperty companyNameProperty() {
         return companyName;
     }
 }

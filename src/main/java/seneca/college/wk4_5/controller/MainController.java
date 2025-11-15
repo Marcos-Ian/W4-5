@@ -22,7 +22,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import seneca.college.wk4_5.model.*;
+import seneca.college.wk4_5.model.Part;
+import seneca.college.wk4_5.model.Product;
+import seneca.college.wk4_5.repository.PartRepository;
+import seneca.college.wk4_5.repository.ProductRepository;
+import seneca.college.wk4_5.service.InventorySeeder;
+import seneca.college.wk4_5.util.ViewLoader;
+
+import javax.inject.Inject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -62,6 +69,22 @@ public class MainController implements Initializable {
     // Exit Button
     @FXML private Button exitButton;
 
+    private final PartRepository partRepository;
+    private final ProductRepository productRepository;
+    private final InventorySeeder inventorySeeder;
+    private final ViewLoader viewLoader;
+
+    @Inject
+    public MainController(PartRepository partRepository,
+                          ProductRepository productRepository,
+                          InventorySeeder inventorySeeder,
+                          ViewLoader viewLoader) {
+        this.partRepository = partRepository;
+        this.productRepository = productRepository;
+        this.inventorySeeder = inventorySeeder;
+        this.viewLoader = viewLoader;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialize Parts Table columns
@@ -76,111 +99,9 @@ public class MainController implements Initializable {
         productInventoryColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
         productPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        // Load sample data (required by workshop - minimum 10 products, 1 part per product)
-        loadSampleData();
-
-        // Bind tables to inventory data
-        partsTable.setItems(Inventory.getAllParts());
-        productsTable.setItems(Inventory.getAllProducts());
-    }
-
-    /**
-     * Loads sample data into the inventory as required by the workshop.
-     * Requirement: Minimum 10 products with at least 1 part per product.
-     */
-    private void loadSampleData() {
-        // Clear any existing data
-        Inventory.clearAllParts();
-        Inventory.clearAllProducts();
-
-        // Create sample parts - varied InHouse and Outsourced parts
-        InHouse part1 = new InHouse(1001, "Brake Rotor", 15.99, 10, 5, 25, 101);
-        InHouse part2 = new InHouse(1002, "Chain", 12.50, 15, 10, 30, 102);
-        Outsourced part3 = new Outsourced(1003, "Tire", 45.00, 8, 5, 20, "Tire Corp");
-        Outsourced part4 = new Outsourced(1004, "Seat", 35.99, 12, 8, 25, "Comfort Inc");
-        InHouse part5 = new InHouse(1005, "Handlebar", 22.75, 20, 15, 40, 103);
-        InHouse part6 = new InHouse(1006, "Pedal", 18.50, 25, 10, 50, 104);
-        Outsourced part7 = new Outsourced(1007, "Helmet", 55.00, 6, 3, 15, "Safety First");
-        InHouse part8 = new InHouse(1008, "Gear System", 89.99, 7, 5, 20, 105);
-        Outsourced part9 = new Outsourced(1009, "Wheel Rim", 65.00, 10, 5, 30, "Rim Masters");
-        InHouse part10 = new InHouse(1010, "Frame", 120.00, 5, 3, 15, 106);
-
-        // Add parts to inventory
-        Inventory.addPart(part1);
-        Inventory.addPart(part2);
-        Inventory.addPart(part3);
-        Inventory.addPart(part4);
-        Inventory.addPart(part5);
-        Inventory.addPart(part6);
-        Inventory.addPart(part7);
-        Inventory.addPart(part8);
-        Inventory.addPart(part9);
-        Inventory.addPart(part10);
-
-        // Update next part ID counter
-        AddPartController.setNextPartId(1011);
-
-        // Create 10 sample products (requirement)
-        // Each product must have at least one associated part
-        Product product1 = new Product(2001, "Mountain Bike", 299.99, 5, 2, 15);
-        product1.addAssociatedPart(part1);
-        product1.addAssociatedPart(part2);
-        product1.addAssociatedPart(part3);
-
-        Product product2 = new Product(2002, "Road Bike", 449.99, 8, 3, 20);
-        product2.addAssociatedPart(part2);
-        product2.addAssociatedPart(part3);
-        product2.addAssociatedPart(part5);
-
-        Product product3 = new Product(2003, "BMX Bike", 199.99, 12, 5, 25);
-        product3.addAssociatedPart(part1);
-        product3.addAssociatedPart(part6);
-
-        Product product4 = new Product(2004, "Electric Bike", 899.99, 4, 2, 10);
-        product4.addAssociatedPart(part8);
-        product4.addAssociatedPart(part10);
-
-        Product product5 = new Product(2005, "Kids Bike", 149.99, 15, 10, 30);
-        product5.addAssociatedPart(part4);
-        product5.addAssociatedPart(part6);
-
-        Product product6 = new Product(2006, "Cruiser Bike", 249.99, 10, 5, 20);
-        product6.addAssociatedPart(part3);
-        product6.addAssociatedPart(part4);
-
-        Product product7 = new Product(2007, "Folding Bike", 329.99, 7, 3, 15);
-        product7.addAssociatedPart(part5);
-        product7.addAssociatedPart(part9);
-
-        Product product8 = new Product(2008, "Hybrid Bike", 379.99, 9, 4, 18);
-        product8.addAssociatedPart(part2);
-        product8.addAssociatedPart(part8);
-
-        Product product9 = new Product(2009, "Tandem Bike", 499.99, 3, 1, 8);
-        product9.addAssociatedPart(part10);
-        product9.addAssociatedPart(part1);
-
-        Product product10 = new Product(2010, "Tricycle", 179.99, 20, 10, 35);
-        product10.addAssociatedPart(part4);
-        product10.addAssociatedPart(part6);
-
-        // Add products to inventory
-        Inventory.addProduct(product1);
-        Inventory.addProduct(product2);
-        Inventory.addProduct(product3);
-        Inventory.addProduct(product4);
-        Inventory.addProduct(product5);
-        Inventory.addProduct(product6);
-        Inventory.addProduct(product7);
-        Inventory.addProduct(product8);
-        Inventory.addProduct(product9);
-        Inventory.addProduct(product10);
-
-        // Update next product ID counter
-        AddProductController.setNextProductId(2011);
-
-        System.out.println("Sample data loaded: " + Inventory.getAllParts().size() +
-                " parts, " + Inventory.getAllProducts().size() + " products");
+        inventorySeeder.seed();
+        partsTable.setItems(partRepository.findAll());
+        productsTable.setItems(productRepository.findAll());
     }
 
     /**
@@ -193,7 +114,7 @@ public class MainController implements Initializable {
 
         // If search field is empty, show all parts
         if (searchText.isEmpty()) {
-            partsTable.setItems(Inventory.getAllParts());
+            partsTable.setItems(partRepository.findAll());
             return;
         }
 
@@ -202,13 +123,13 @@ public class MainController implements Initializable {
         // Try to search by ID first
         try {
             int partId = Integer.parseInt(searchText);
-            Part foundPart = Inventory.searchPartByID(partId);
+            Part foundPart = partRepository.findById(partId);
             if (foundPart != null) {
                 searchResults.add(foundPart);
             }
         } catch (NumberFormatException e) {
             // If not a number, search by name
-            searchResults = Inventory.searchPartByName(searchText);
+            searchResults = partRepository.findByName(searchText);
         }
 
         partsTable.setItems(searchResults);
@@ -227,7 +148,7 @@ public class MainController implements Initializable {
     @FXML
     void onAddPart(ActionEvent event) {
         try {
-            openWindow("/addPartForm.fxml", "Add Part", 400, 500);
+            openWindow("/seneca/college/wk4_5/addPartForm.fxml", "Add Part", 400, 500);
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Could not open Add Part screen.");
             e.printStackTrace();
@@ -249,8 +170,8 @@ public class MainController implements Initializable {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/modifyPartForm.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = viewLoader.load("/seneca/college/wk4_5/modifyPartForm.fxml");
+            Parent root = loader.getRoot();
 
             // Pass the selected part to the controller
             ModifyPartController controller = loader.getController();
@@ -291,7 +212,7 @@ public class MainController implements Initializable {
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean deleted = Inventory.deletePart(selectedPart);
+            boolean deleted = partRepository.remove(selectedPart);
             if (deleted) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Part deleted successfully.");
             } else {
@@ -311,7 +232,7 @@ public class MainController implements Initializable {
 
         // If search field is empty, show all products
         if (searchText.isEmpty()) {
-            productsTable.setItems(Inventory.getAllProducts());
+            productsTable.setItems(productRepository.findAll());
             return;
         }
 
@@ -320,13 +241,13 @@ public class MainController implements Initializable {
         // Try to search by ID first
         try {
             int productId = Integer.parseInt(searchText);
-            Product foundProduct = Inventory.searchProductByID(productId);
+            Product foundProduct = productRepository.findById(productId);
             if (foundProduct != null) {
                 searchResults.add(foundProduct);
             }
         } catch (NumberFormatException e) {
             // If not a number, search by name
-            searchResults = Inventory.searchProductByName(searchText);
+            searchResults = productRepository.findByName(searchText);
         }
 
         productsTable.setItems(searchResults);
@@ -345,7 +266,7 @@ public class MainController implements Initializable {
     @FXML
     void onAddProduct(ActionEvent event) {
         try {
-            openWindow("/addProductForm.fxml", "Add Product", 900, 600);
+            openWindow("/seneca/college/wk4_5/addProductForm.fxml", "Add Product", 900, 600);
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Could not open Add Product screen.");
             e.printStackTrace();
@@ -367,8 +288,8 @@ public class MainController implements Initializable {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/modifyProductForm.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = viewLoader.load("/seneca/college/wk4_5/modifyProductForm.fxml");
+            Parent root = loader.getRoot();
 
             // Pass the selected product to the controller
             ModifyProductController controller = loader.getController();
@@ -402,13 +323,6 @@ public class MainController implements Initializable {
         }
 
         // REQUIRED VALIDATION: Check if product has associated parts
-        if (!selectedProduct.getAllAssociatedParts().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Cannot Delete",
-                    "Cannot delete a product that has associated parts. " +
-                            "Please remove all associated parts first.");
-            return;
-        }
-
         // Confirmation dialog (required by workshop)
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Delete");
@@ -418,13 +332,17 @@ public class MainController implements Initializable {
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean deleted = Inventory.deleteProduct(selectedProduct);
-            if (deleted) {
-                showAlert(Alert.AlertType.INFORMATION, "Success",
-                        "Product deleted successfully.");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Delete Failed",
-                        "Could not delete the selected product.");
+            try {
+                boolean deleted = productRepository.remove(selectedProduct);
+                if (deleted) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success",
+                            "Product deleted successfully.");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Delete Failed",
+                            "Could not delete the selected product.");
+                }
+            } catch (IllegalStateException ex) {
+                showAlert(Alert.AlertType.ERROR, "Cannot Delete", ex.getMessage());
             }
         }
     }
@@ -458,8 +376,8 @@ public class MainController implements Initializable {
      */
     private void openWindow(String fxmlPath, String title, int width, int height)
             throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        Parent root = loader.load();
+        FXMLLoader loader = viewLoader.load(fxmlPath);
+        Parent root = loader.getRoot();
 
         Stage stage = new Stage();
         stage.setTitle(title);

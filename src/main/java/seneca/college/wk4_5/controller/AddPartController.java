@@ -17,10 +17,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import seneca.college.wk4_5.model.InHouse;
-import seneca.college.wk4_5.model.Inventory;
 import seneca.college.wk4_5.model.Outsourced;
 import seneca.college.wk4_5.model.Part;
+import seneca.college.wk4_5.repository.PartRepository;
 
+import javax.inject.Inject;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -52,13 +53,16 @@ public class AddPartController implements Initializable {
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
 
-    // Static variable to track next available ID
-    private static int nextPartId = 1000; // Starting from 1000 for parts
+    private final PartRepository partRepository;
+
+    @Inject
+    public AddPartController(PartRepository partRepository) {
+        this.partRepository = partRepository;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Set auto-generated ID
-        idField.setText(String.valueOf(getNextPartId()));
+        idField.setText(String.valueOf(partRepository.peekNextId()));
 
         // Set initial state for In-House (default selection)
         updateFieldsForPartType();
@@ -124,11 +128,7 @@ public class AddPartController implements Initializable {
                 newPart = new Outsourced(id, name, price, stock, min, max, companyName);
             }
 
-            // Add to inventory
-            Inventory.addPart(newPart);
-
-            // Update the next part ID
-            nextPartId++;
+            partRepository.add(newPart);
 
             // Show success message
             showAlert(Alert.AlertType.INFORMATION, "Success", "Part added successfully!");
@@ -310,17 +310,4 @@ public class AddPartController implements Initializable {
         stage.close();
     }
 
-    /**
-     * Gets the next available part ID
-     */
-    public static int getNextPartId() {
-        return nextPartId;
-    }
-
-    /**
-     * Sets the next part ID (useful for initialization)
-     */
-    public static void setNextPartId(int id) {
-        nextPartId = id;
-    }
 }

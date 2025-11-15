@@ -17,9 +17,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import seneca.college.wk4_5.model.InHouse;
-import seneca.college.wk4_5.model.Inventory;
 import seneca.college.wk4_5.model.Outsourced;
 import seneca.college.wk4_5.model.Part;
+import seneca.college.wk4_5.repository.PartRepository;
+
+import javax.inject.Inject;
 
 import java.net.URL;
 import java.util.Optional;
@@ -54,7 +56,12 @@ public class ModifyPartController implements Initializable {
 
     // The part being modified
     private Part partToModify;
-    private int partIndex;
+    private final PartRepository partRepository;
+
+    @Inject
+    public ModifyPartController(PartRepository partRepository) {
+        this.partRepository = partRepository;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -74,7 +81,6 @@ public class ModifyPartController implements Initializable {
         }
 
         this.partToModify = part;
-        this.partIndex = Inventory.getPartIndex(part);
 
         // Debug output
         System.out.println("Initializing modify form with part: " + part.getName() + " (ID: " + part.getId() + ")");
@@ -173,8 +179,8 @@ public class ModifyPartController implements Initializable {
                 updatedPart = new Outsourced(id, name, price, stock, min, max, companyName);
             }
 
-            // Update the part in inventory
-            Inventory.updatePart(partIndex, updatedPart);
+            partRepository.replace(partToModify, updatedPart);
+            partToModify = updatedPart;
 
             // Show success message
             showAlert(Alert.AlertType.INFORMATION, "Success", "Part updated successfully!");

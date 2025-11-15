@@ -19,21 +19,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import seneca.college.wk4_5.model.Inventory;
 import seneca.college.wk4_5.model.Part;
 import seneca.college.wk4_5.model.Product;
+import seneca.college.wk4_5.repository.PartRepository;
+import seneca.college.wk4_5.repository.ProductRepository;
 
+import javax.inject.Inject;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-/**
- * AddProductController handles the Add Product screen functionality.
- * Allows users to create new products and associate parts with them.
- */
 public class AddProductController implements Initializable {
 
-    // Product information fields
     @FXML private TextField idField;
     @FXML private TextField nameField;
     @FXML private TextField invField;
@@ -41,87 +38,74 @@ public class AddProductController implements Initializable {
     @FXML private TextField maxField;
     @FXML private TextField minField;
 
-    // Parts search and management
     @FXML private TextField partSearchField;
     @FXML private Button searchButton;
     @FXML private Button addPartButton;
     @FXML private Button removeAssociatedPartButton;
 
-    // Available parts table
     @FXML private TableView<Part> availablePartsTable;
     @FXML private TableColumn<Part, Integer> availablePartIdColumn;
     @FXML private TableColumn<Part, String> availablePartNameColumn;
     @FXML private TableColumn<Part, Integer> availablePartInventoryColumn;
     @FXML private TableColumn<Part, Double> availablePartPriceColumn;
 
-    // Associated parts table
     @FXML private TableView<Part> associatedPartsTable;
     @FXML private TableColumn<Part, Integer> associatedPartIdColumn;
     @FXML private TableColumn<Part, String> associatedPartNameColumn;
     @FXML private TableColumn<Part, Integer> associatedPartInventoryColumn;
     @FXML private TableColumn<Part, Double> associatedPartPriceColumn;
 
-    // Action buttons
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
 
-    // Data collections
-    private ObservableList<Part> associatedParts = FXCollections.observableArrayList();
+    private final ObservableList<Part> associatedParts = FXCollections.observableArrayList();
+    private final PartRepository partRepository;
+    private final ProductRepository productRepository;
 
-    // Static variable to track next available ID
-    private static int nextProductId = 2000; // Starting from 2000 for products
+    @Inject
+    public AddProductController(PartRepository partRepository, ProductRepository productRepository) {
+        this.partRepository = partRepository;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Set auto-generated ID
-        idField.setText(String.valueOf(getNextProductId()));
+        idField.setText(String.valueOf(productRepository.peekNextId()));
 
-        // Initialize Available Parts Table
         availablePartIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         availablePartNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         availablePartInventoryColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
         availablePartPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        // Initialize Associated Parts Table
         associatedPartIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         associatedPartNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         associatedPartInventoryColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
         associatedPartPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        // Load all parts initially
-        availablePartsTable.setItems(Inventory.getAllParts());
-
-        // Set associated parts table
+        availablePartsTable.setItems(partRepository.findAll());
         associatedPartsTable.setItems(associatedParts);
-
-        // Add input validation listeners
         addValidationListeners();
     }
 
-    /**
-     * Handles the search parts action
-     */
     @FXML
     void onSearchParts(ActionEvent event) {
         String searchText = partSearchField.getText().trim();
 
         if (searchText.isEmpty()) {
-            availablePartsTable.setItems(Inventory.getAllParts());
+            availablePartsTable.setItems(partRepository.findAll());
             return;
         }
 
-        ObservableList<Part> searchResults = FXCollections.observableArrayList();
-
-        // Try to search by ID first
+        ObservableList<Part> searchResults;
         try {
             int partId = Integer.parseInt(searchText);
-            Part foundPart = Inventory.searchPartByID(partId);
+            Part foundPart = partRepository.findById(partId);
+            searchResults = FXCollections.observableArrayList();
             if (foundPart != null) {
                 searchResults.add(foundPart);
             }
         } catch (NumberFormatException e) {
-            // If not a number, search by name
-            searchResults = Inventory.searchPartByName(searchText);
+            searchResults = partRepository.findByName(searchText);
         }
 
         availablePartsTable.setItems(searchResults);
@@ -131,9 +115,6 @@ public class AddProductController implements Initializable {
         }
     }
 
-    /**
-     * Handles adding a part to the product
-     */
     @FXML
     void onAddPart(ActionEvent event) {
         Part selectedPart = availablePartsTable.getSelectionModel().getSelectedItem();
@@ -143,20 +124,15 @@ public class AddProductController implements Initializable {
             return;
         }
 
-        // Check if part is already associated
         if (associatedParts.contains(selectedPart)) {
             showAlert(Alert.AlertType.WARNING, "Duplicate Part", "This part is already associated with the product.");
             return;
         }
 
-        // Add to associated parts
         associatedParts.add(selectedPart);
         showAlert(Alert.AlertType.INFORMATION, "Part Added", "Part successfully added to product.");
     }
 
-    /**
-     * Handles removing an associated part from the product
-     */
     @FXML
     void onRemoveAssociatedPart(ActionEvent event) {
         Part selectedPart = associatedPartsTable.getSelectionModel().getSelectedItem();
@@ -166,7 +142,6 @@ public class AddProductController implements Initializable {
             return;
         }
 
-        // Confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Remove");
         confirmAlert.setHeaderText("Remove Associated Part");
@@ -179,18 +154,13 @@ public class AddProductController implements Initializable {
         }
     }
 
-    /**
-     * Handles the Save button action
-     */
     @FXML
     void onSave(ActionEvent event) {
         try {
-            // Validate all input fields
             if (!validateInput()) {
                 return;
             }
 
-            // Parse input values
             int id = Integer.parseInt(idField.getText());
             String name = nameField.getText().trim();
             int stock = Integer.parseInt(invField.getText());
@@ -198,29 +168,15 @@ public class AddProductController implements Initializable {
             int min = Integer.parseInt(minField.getText());
             int max = Integer.parseInt(maxField.getText());
 
-            // Validate business rules
             if (!validateBusinessRules(stock, min, max, price)) {
                 return;
             }
 
-            // Create new product
             Product newProduct = new Product(id, name, price, stock, min, max);
+            associatedParts.forEach(newProduct::addAssociatedPart);
+            productRepository.add(newProduct);
 
-            // Add all associated parts
-            for (Part part : associatedParts) {
-                newProduct.addAssociatedPart(part);
-            }
-
-            // Add to inventory
-            Inventory.addProduct(newProduct);
-
-            // Update the next product ID
-            nextProductId++;
-
-            // Show success message
             showAlert(Alert.AlertType.INFORMATION, "Success", "Product added successfully!");
-
-            // Close this window
             closeWindow();
 
         } catch (NumberFormatException e) {
@@ -231,12 +187,8 @@ public class AddProductController implements Initializable {
         }
     }
 
-    /**
-     * Handles the Cancel button action
-     */
     @FXML
     void onCancel(ActionEvent event) {
-        // Show confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Cancel");
         confirmAlert.setHeaderText("Cancel Add Product");
@@ -248,11 +200,7 @@ public class AddProductController implements Initializable {
         }
     }
 
-    /**
-     * Validates all input fields
-     */
     private boolean validateInput() {
-        // Check if required fields are empty
         if (nameField.getText().trim().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "Product name is required.");
             return false;
@@ -278,7 +226,6 @@ public class AddProductController implements Initializable {
             return false;
         }
 
-        // Validate numeric fields
         try {
             Integer.parseInt(invField.getText().trim());
             Double.parseDouble(priceField.getText().trim());
@@ -293,25 +240,19 @@ public class AddProductController implements Initializable {
         return true;
     }
 
-    /**
-     * Validates business rules
-     */
     private boolean validateBusinessRules(int stock, int min, int max, double price) {
-        // Check min <= max
         if (min > max) {
             showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Minimum value cannot be greater than maximum value.");
             return false;
         }
 
-        // Check min <= stock <= max
         if (stock < min || stock > max) {
             showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Inventory level must be between minimum and maximum values.");
             return false;
         }
 
-        // Check positive values
         if (min < 0 || max < 0 || stock < 0) {
             showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Minimum, Maximum, and Inventory values must be non-negative.");
@@ -319,24 +260,17 @@ public class AddProductController implements Initializable {
         }
 
         if (price < 0) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error",
-                    "Price must be a positive value.");
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Price must be a positive value.");
             return false;
         }
 
-        // Check that product has at least one associated part
         if (associatedParts.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "A product must have at least one associated part.");
             return false;
         }
 
-        // Check that product price is not less than cost of parts
-        double totalPartsCost = 0.0;
-        for (Part part : associatedParts) {
-            totalPartsCost += part.getPrice();
-        }
-
+        double totalPartsCost = associatedParts.stream().mapToDouble(Part::getPrice).sum();
         if (price < totalPartsCost) {
             showAlert(Alert.AlertType.ERROR, "Validation Error",
                     String.format("Product price ($%.2f) cannot be less than the total cost of associated parts ($%.2f).",
@@ -347,20 +281,13 @@ public class AddProductController implements Initializable {
         return true;
     }
 
-    /**
-     * Adds input validation listeners to numeric fields
-     */
     private void addValidationListeners() {
-        // Add listeners to numeric fields to allow only numbers
         addNumericValidation(invField);
         addNumericValidation(minField);
         addNumericValidation(maxField);
         addDecimalValidation(priceField);
     }
 
-    /**
-     * Adds numeric validation to a text field (integers only)
-     */
     private void addNumericValidation(TextField textField) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -369,9 +296,6 @@ public class AddProductController implements Initializable {
         });
     }
 
-    /**
-     * Adds decimal validation to a text field (allows decimal numbers)
-     */
     private void addDecimalValidation(TextField textField) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*\\.?\\d*")) {
@@ -380,9 +304,6 @@ public class AddProductController implements Initializable {
         });
     }
 
-    /**
-     * Shows an alert dialog
-     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -391,25 +312,8 @@ public class AddProductController implements Initializable {
         alert.showAndWait();
     }
 
-    /**
-     * Closes the current window
-     */
     private void closeWindow() {
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
-    }
-
-    /**
-     * Gets the next available product ID
-     */
-    public static int getNextProductId() {
-        return nextProductId;
-    }
-
-    /**
-     * Sets the next product ID (useful for initialization)
-     */
-    public static void setNextProductId(int id) {
-        nextProductId = id;
     }
 }

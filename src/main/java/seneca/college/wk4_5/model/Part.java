@@ -19,13 +19,12 @@ package seneca.college.wk4_5.model;
  */
 public abstract class Part {
 
-    // Private instance variables as per UML diagram
-    private int id;
-    private String name;
-    private double price;
-    private int stock;
-    private int min;
-    private int max;
+    private final javafx.beans.property.IntegerProperty id;
+    private final javafx.beans.property.StringProperty name;
+    private final javafx.beans.property.DoubleProperty price;
+    private final javafx.beans.property.IntegerProperty stock;
+    private final javafx.beans.property.IntegerProperty min;
+    private final javafx.beans.property.IntegerProperty max;
 
     /**
      * Constructor for Part class as specified in UML diagram
@@ -38,12 +37,12 @@ public abstract class Part {
      * @param max   The maximum stock level allowed
      */
     public Part(int id, String name, double price, int stock, int min, int max) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.stock = stock;
-        this.min = min;
-        this.max = max;
+        this.id = new javafx.beans.property.SimpleIntegerProperty(id);
+        this.name = new javafx.beans.property.SimpleStringProperty(name);
+        this.price = new javafx.beans.property.SimpleDoubleProperty(price);
+        this.stock = new javafx.beans.property.SimpleIntegerProperty(stock);
+        this.min = new javafx.beans.property.SimpleIntegerProperty(min);
+        this.max = new javafx.beans.property.SimpleIntegerProperty(max);
     }
 
     // Setter methods as specified in UML
@@ -54,7 +53,7 @@ public abstract class Part {
      * @param id The ID to set
      */
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     /**
@@ -63,7 +62,7 @@ public abstract class Part {
      * @param name The name to set
      */
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     /**
@@ -72,7 +71,7 @@ public abstract class Part {
      * @param price The price to set
      */
     public void setPrice(double price) {
-        this.price = price;
+        this.price.set(price);
     }
 
     /**
@@ -81,7 +80,7 @@ public abstract class Part {
      * @param stock The stock level to set
      */
     public void setStock(int stock) {
-        this.stock = stock;
+        this.stock.set(stock);
     }
 
     /**
@@ -90,7 +89,7 @@ public abstract class Part {
      * @param min The minimum stock level to set
      */
     public void setMin(int min) {
-        this.min = min;
+        this.min.set(min);
     }
 
     /**
@@ -99,7 +98,7 @@ public abstract class Part {
      * @param max The maximum stock level to set
      */
     public void setMax(int max) {
-        this.max = max;
+        this.max.set(max);
     }
 
     /**
@@ -108,7 +107,7 @@ public abstract class Part {
      * @return The part ID
      */
     public int getId() {
-        return id;
+        return id.get();
     }
 
     /**
@@ -117,7 +116,7 @@ public abstract class Part {
      * @return The part name
      */
     public String getName() {
-        return name;
+        return name.get();
     }
 
     /**
@@ -126,7 +125,7 @@ public abstract class Part {
      * @return The part price
      */
     public double getPrice() {
-        return price;
+        return price.get();
     }
 
     /**
@@ -135,7 +134,7 @@ public abstract class Part {
      * @return The current stock level
      */
     public int getStock() {
-        return stock;
+        return stock.get();
     }
 
     /**
@@ -144,7 +143,7 @@ public abstract class Part {
      * @return The minimum stock level
      */
     public int getMin() {
-        return min;
+        return min.get();
     }
 
     /**
@@ -153,6 +152,30 @@ public abstract class Part {
      * @return The maximum stock level
      */
     public int getMax() {
+        return max.get();
+    }
+
+    public javafx.beans.property.IntegerProperty idProperty() {
+        return id;
+    }
+
+    public javafx.beans.property.StringProperty nameProperty() {
+        return name;
+    }
+
+    public javafx.beans.property.DoubleProperty priceProperty() {
+        return price;
+    }
+
+    public javafx.beans.property.IntegerProperty stockProperty() {
+        return stock;
+    }
+
+    public javafx.beans.property.IntegerProperty minProperty() {
+        return min;
+    }
+
+    public javafx.beans.property.IntegerProperty maxProperty() {
         return max;
     }
 }
