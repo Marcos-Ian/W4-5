@@ -11,12 +11,16 @@
  **********************************************/
 package seneca.college.wk4_5;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import seneca.college.wk4_5.config.InventoryModule;
 import seneca.college.wk4_5.controller.LoginController;
+import seneca.college.wk4_5.util.ViewLoader;
 
 /**
  * Main application class for the Inventory Management System.
@@ -25,12 +29,15 @@ import seneca.college.wk4_5.controller.LoginController;
 public class InventoryManagementApp extends Application {
 
     private Stage primaryStage;
+    private Injector injector;
+    private ViewLoader viewLoader;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        this.injector = Guice.createInjector(new InventoryModule());
+        this.viewLoader = injector.getInstance(ViewLoader.class);
 
-        // Start with login screen instead of main screen
         showLoginScreen();
     }
 
@@ -39,9 +46,8 @@ public class InventoryManagementApp extends Application {
      */
     private void showLoginScreen() {
         try {
-            // Use the path that works - Path 2 from your debug output
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = viewLoader.load("/seneca/college/wk4_5/login.fxml");
+            Parent root = loader.getRoot();
 
             // Get the controller and pass reference to this main app
             LoginController loginController = loader.getController();
@@ -72,15 +78,15 @@ public class InventoryManagementApp extends Application {
      */
     public void showMainScreen() {
         try {
-            // Use the path that works - Path 2 from your debug output
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = viewLoader.load("/seneca/college/wk4_5/main.fxml");
+            Parent root = loader.getRoot();
 
             // Update the primary stage to show main screen
             primaryStage.setTitle("Inventory Management System");
             primaryStage.setScene(new Scene(root, 1200, 600));
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
+            primaryStage.show();
 
         } catch (Exception e) {
             System.err.println("Error loading main screen: " + e.getMessage());

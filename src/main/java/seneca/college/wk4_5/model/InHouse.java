@@ -17,8 +17,7 @@ package seneca.college.wk4_5.model;
  */
 public class InHouse extends Part {
 
-    // Private instance variable as per UML diagram
-    private int machineId;
+    private final javafx.beans.property.IntegerProperty machineId;
 
     /**
      * Constructor for InHouse part as specified in UML diagram
@@ -34,7 +33,7 @@ public class InHouse extends Part {
     public InHouse(int id, String name, double price, int stock, int min, int max, int machineId) {
         // Call parent constructor
         super(id, name, price, stock, min, max);
-        this.machineId = machineId;
+        this.machineId = new javafx.beans.property.SimpleIntegerProperty(machineId);
     }
 
     /**
@@ -43,7 +42,7 @@ public class InHouse extends Part {
      * @param machineId The machine ID to set
      */
     public void setMachine(int machineId) {
-        this.machineId = machineId;
+        this.machineId.set(machineId);
     }
 
     /**
@@ -52,6 +51,10 @@ public class InHouse extends Part {
      * @return The machine ID
      */
     public int getMachine() {
+        return machineId.get();
+    }
+
+    public javafx.beans.property.IntegerProperty machineIdProperty() {
         return machineId;
     }
 }
