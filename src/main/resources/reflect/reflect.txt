@@ -1,0 +1,50 @@
+/**********************************************
+ Workshop #4-5
+ Course:APD545 - S5
+ Last Name:Araujo Carneiro
+ First Name:Marcos Ian
+ ID:153220223
+ Section:NCC
+ This assignment represents my own work in accordance with Seneca Academic Policy.
+ Signature
+ Date:05-11-2025
+ **********************************************/
+
+1. How did using JavaFX Property types help with binding and UI updates?
+
+SimpleStringProperty, SimpleIntegerProperty and SimpleDoubleProperty were used as JavaFX property types as opposed to using the primitives which made it easy to integrate with Table view components. In my Part and Product classes, the properties enabled the automatic data binding using PropertyValueFactory without refresh logic.
+For example:
+javapartNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+Changes would automatically be reflected in the main table when I changed parts or products using the modify controllers. This has not only removed any observer patterns or manual UI update code but also minimises any potential bugs and offers good separation between the model and view layers.
+
+
+2. What benefits did repositories provide instead of direct collection management?
+
+The pattern of repository (PartRepository, ProductRepository) offered four important advantages:
+Single point of entry: CRUD operations were all contained in repository classes. Controllers did not have to be aware of data storage: they simply invoked repository methods. This implies that I would be able to change to database storage later without any controller code.
+Automatic ID management Repositories did the job of ID management by peekNextId() and AtomicInteger sequences, which guaranteed unique IDs and did away with conflicts.
+Business rule implementation: Repositories implemented important data layer rules. An example of this is InMemoryProductRepository. remove() checking if there are no parts related to the products when they are deleted, and therefore this rule is followed even with which controller is deleting the products.
+Better testability: It was easy to develop mock repositories to test controllers without having real data.
+
+
+3. How did DI/IoC improve testability and reduce coupling?
+
+Dependency Edinburgh: Google Guice expressed dependencies explicitly with the help of constructor injection:
+java@Inject
+public MainController(PartRepository partRepository,
+                      (ProductRepository productRepository,) {
+This was of three great advantages:
+Minimal coupling Controllers were not tied to concrete implementations, as they relied on interfaces (PartRepository) instead of concrete implementations (InMemoryPartRepository), and were therefore not constrained or difficult to maintain.
+Increased testability: I would be able to inject mock repositories to do unit testing without a complete application environment. Controllers do not know whether they are working on real or fake implementations.
+Automatic lifecycle management: Guice managed singlets (such as InventorySeeder) and dependency injection of dynamically loaded FXML views using ViewLoader, which is consistent throughout the application.
+
+
+4. How did you prevent invalid operations like deleting products with associated parts?
+
+Repository level protection: InMemoryProductRepository. remove() this throws an IllegalStateException when the product has related parts- the last defense against unjustified operations.
+controller level: In the onDeleteProduct method of the MainController, I used try-catch blocks to operate deletion to show user-friendly error messages in case the repository refuses operations due to the invalidity of the operation performed.
+Input validation: All the controllers authenticate necessary fields, numeric structure, and business policies (min [?] stock [?] max, no negative values, product price [?] total parts cost).
+On-the-fly validation: The input listeners avoid invalid characters being typed by the user (e.g. addNumericValidation() only accepts digits).
+Confirmation dialogs: The destructive operations must be confirmed by the user.
+Null checks: Controllers will check if there are selections before trying to perform operations.
+This methodology early detects bogus operations at the UI, authenticate them in the controllers and blocks them as a last line of defence in repositories, which guarantees the integrity of data and user feedback.

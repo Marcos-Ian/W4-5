@@ -24,7 +24,7 @@ import seneca.college.wk4_5.model.Product;
 import seneca.college.wk4_5.repository.PartRepository;
 import seneca.college.wk4_5.repository.ProductRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;

@@ -21,7 +21,7 @@ import seneca.college.wk4_5.model.Outsourced;
 import seneca.college.wk4_5.model.Part;
 import seneca.college.wk4_5.repository.PartRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import java.net.URL;
 import java.util.Optional;

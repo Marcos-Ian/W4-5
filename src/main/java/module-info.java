@@ -4,7 +4,8 @@ module seneca.college.wk4_5 {
     requires java.sql;
     requires java.desktop;
     requires com.google.guice;
-    requires javax.inject;
+    requires jakarta.inject;
+
 
 
     opens seneca.college.wk4_5 to javafx.fxml;

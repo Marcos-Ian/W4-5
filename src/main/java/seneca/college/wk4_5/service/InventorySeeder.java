@@ -7,8 +7,8 @@ import seneca.college.wk4_5.model.Product;
 import seneca.college.wk4_5.repository.PartRepository;
 import seneca.college.wk4_5.repository.ProductRepository;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
