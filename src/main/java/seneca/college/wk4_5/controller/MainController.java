@@ -65,6 +65,12 @@ public class MainController implements Initializable {
     @FXML private Button modifyProductButton;
     @FXML private Button deleteProductButton;
 
+    // Data Persistence Buttons
+    @FXML private Button saveDataToFileButton;
+    @FXML private Button loadDataFromFileButton;
+    @FXML private Button writeDataOnDbButton;
+    @FXML private Button loadDataFromDbButton;
+
     // Exit Button
     @FXML private Button exitButton;
 
@@ -344,6 +350,42 @@ public class MainController implements Initializable {
                 showAlert(Alert.AlertType.ERROR, "Cannot Delete", ex.getMessage());
             }
         }
+    }
+
+    /**
+     * Handles writing the current data to a file (XML placeholder).
+     */
+    @FXML
+    void onSaveDataToFile(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Save Data To File",
+                "Write object to file (XML) action triggered.");
+    }
+
+    /**
+     * Handles loading data from a file.
+     */
+    @FXML
+    void onLoadDataFromFile(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Load Data From File",
+                "Read object from file action triggered.");
+    }
+
+    /**
+     * Handles writing the current data to the database.
+     */
+    @FXML
+    void onWriteDataOnDb(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Write Data on DB",
+                "Save current data to database action triggered.");
+    }
+
+    /**
+     * Handles loading data from the database.
+     */
+    @FXML
+    void onLoadDataFromDb(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Load Data from DB",
+                "Load data from database action triggered.");
     }
 
     /**

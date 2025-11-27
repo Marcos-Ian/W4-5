@@ -73,6 +73,16 @@
             </children>
         </HBox>
 
+        <!-- Data Persistence Buttons -->
+        <HBox alignment="CENTER" layoutX="210.0" layoutY="490.0" spacing="20">
+            <children>
+                <Button fx:id="saveDataToFileButton" mnemonicParsing="false" onAction="#onSaveDataToFile" prefHeight="35.0" prefWidth="180.0" text="Save Data To File" />
+                <Button fx:id="loadDataFromFileButton" mnemonicParsing="false" onAction="#onLoadDataFromFile" prefHeight="35.0" prefWidth="180.0" text="Load Data From File" />
+                <Button fx:id="writeDataOnDbButton" mnemonicParsing="false" onAction="#onWriteDataOnDb" prefHeight="35.0" prefWidth="180.0" text="Write Data on DB" />
+                <Button fx:id="loadDataFromDbButton" mnemonicParsing="false" onAction="#onLoadDataFromDb" prefHeight="35.0" prefWidth="180.0" text="Load Data from DB" />
+            </children>
+        </HBox>
+
         <!-- Exit Button - Centered at Bottom -->
         <Button fx:id="exitButton" layoutX="550.0" layoutY="530.0" mnemonicParsing="false" onAction="#onExit" prefWidth="100.0" prefHeight="35.0" text="Exit">
             <font>
